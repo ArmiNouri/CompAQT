@@ -254,7 +254,7 @@ def convert_hitab_to_finqa(path, j):
         else:
             facts_dict[i] += ' ' + f
     output['qa']['gold_inds'] = facts_dict
-    output['pre_text'] = table.title
+    output['pre_text'] = [table.title]
     output['post_text'] = ''
     return output
 
