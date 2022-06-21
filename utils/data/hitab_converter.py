@@ -234,12 +234,23 @@ class Program:
         return output
 
 
+def convert_hitab_text_to_pre_text(item):
+    post_text = []
+    for paragraph in item:
+        sentences = paragraph.split(".")
+        for sentence in sentences:
+            tokens = tokenize(sentence)
+            if len(tokens) > 0:
+                post_text.append(tokens + " .")
+    return post_text
+
+
 def convert_hitab_to_finqa(path, j):
     output = {}
     output['id'] = j['id']
     output['qa'] = {}
     output['qa']['question'] = j['question']
-    output['qa']['exe_ans'] = j['answer']
+    output['qa']['exe_ans'] = j['answer'][0]
     program = Program(j, j['answer_formulas'][0][1:], j['answer'])
     output['qa']['program'] = program.finqa_format
     table = Table(os.path.join(os.path.dirname(path), 'tables'), j['table_id'])
@@ -254,8 +265,8 @@ def convert_hitab_to_finqa(path, j):
         else:
             facts_dict[i] += ' ' + f
     output['qa']['gold_inds'] = facts_dict
-    output['pre_text'] = [table.title]
-    output['post_text'] = ''
+    output['pre_text'] = convert_hitab_text_to_pre_text([table.title])
+    output['post_text'] = []
     return output
 
 

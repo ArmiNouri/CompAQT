@@ -146,13 +146,24 @@ class Table:
         return 'The ' + self.table[i][0] + fix + ' is ' + cell + ' ;'
 
 
+def convert_multihiertt_text_to_post_text(item):
+    post_text = []
+    for paragraph in item['paragraphs']:
+        sentences = paragraph.split(".")
+        for sentence in sentences:
+            tokens = tokenize(sentence)
+            if len(tokens) > 0:
+                post_text.append(tokens + " .")
+    return post_text
+
+
 def convert_multihiertt_to_finqa(j, idx):
     output = {}
     output['id'] = j['uid']
     output['qa'] = {}
     output['qa']['question'] = j['qa']['question']
     output['qa']['exe_ans'] = j['qa']['answer']
-    output['qa']['program'] = j['qa']['program']
+    output['qa']['program'] = j['qa']['program'].replace(',', ', ')
     table = Table(j['tables'], idx)
     output['table_ori'] = table.raw['table']
     output['table'] = table.table
@@ -160,13 +171,17 @@ def convert_multihiertt_to_finqa(j, idx):
     for ix in j['qa']['table_evidence']:
         row = ix.split('-')[1]
         i = "table_" + str(row)
-        facts_dict[i] = j['table_description'][ix]
+        if i not in facts_dict:
+            facts_dict[i] = tokenize(j['table_description'][ix][:-1])
+        else: 
+            facts_dict[i] += ' ' 
+            facts_dict[i] += tokenize(j['table_description'][ix][:-1])
     for ix in j['qa']['text_evidence']:
         i = 'text_' + str(ix)
         facts_dict[i] = tokenize(j['paragraphs'][ix])
     output['qa']['gold_inds'] = facts_dict
-    output['pre_text'] = j['paragraphs']
-    output['post_text'] = ''
+    output['pre_text'] = []
+    output['post_text'] = convert_multihiertt_text_to_post_text(j)
     return output
 
 
@@ -224,16 +239,16 @@ def stats(train, dev):
 
 if __name__ == "__main__":
 
-    stats('../../datasets/multihiertt/multihiertt_dataset_train_finqa.json', '../../datasets/multihiertt/multihiertt_dataset_dev_finqa.json')
+    # stats('../../datasets/multihiertt/multihiertt_dataset_train_finqa.json', '../../datasets/multihiertt/multihiertt_dataset_dev_finqa.json')
     
-    # args = my_parser.parse_args()
-    # input_path = Path(args.input_path)
+    args = my_parser.parse_args()
+    input_path = Path(args.input_path)
 
-    # if not input_path.exists():
-    #     print(f"The given input path does not exist: {input_path}")
-    #     sys.exit(1)
+    if not input_path.exists():
+        print(f"The given input path does not exist: {input_path}")
+        sys.exit(1)
 
-    # j = run(args.input_path)
-    # print(len(j))
-    # with open(args.output_path, 'w') as f:
-    #     json.dump(j, f)
+    j = run(args.input_path)
+    print(len(j))
+    with open(args.output_path, 'w') as f:
+        json.dump(j, f)
