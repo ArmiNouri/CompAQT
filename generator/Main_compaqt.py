@@ -169,7 +169,7 @@ def train():
             this_loss = this_loss.sum() / program_mask.sum()
 
             #############compositional loss################
-            this_loss = 0.9 * this_loss
+            this_loss = (1.0-conf.lmbda) * this_loss
             start_weights = torch.zeros_like(all_weights[0])
             all_weights = [start_weights] + all_weights
             for i in range(distances.size(0)): distances[i].fill_diagonal_(1.0)

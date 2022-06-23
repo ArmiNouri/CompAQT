@@ -43,13 +43,11 @@ You can set up the environment by installing all requirements: `pip install -r r
 
 ## To run the FinQA model
 The code is largely adapted from [FinQA](https://github.com/czyssrs/finqa). All configurations are modifiable within `generator/config.py`
-First navigate to the generator: `cd generator`
-Next, make sure the scripts are executable, e.g. by running `chmod +x run_finqa.sh`
-* To run FinQA without CompAQT: `./run_finqa.sh`
-* To run FinQA with CompAQT: `./run_finqa_compaqt.sh`
+* First navigate to the generator: `cd generator`
+* Run `chmod +x run_finqa.sh`
+* To run FinQA with CompAQT: `./run_finqa.sh`
 
 ## To run the PVN model
-First navigate to the generator: `cd generator`
-Next, make sure the scripts are executable, e.g. by running `chmod +x run_pvn.sh`
-* To run FinQA without CompAQT: `./run_pvn.sh`
-* To run FinQA with CompAQT: `./run_pvn_compaqt.sh`
+* First navigate to the generator: `cd generator`
+* Run `chmod +x run_pvn.sh`
+* To run FinQA with CompAQT: `./run_pvn.sh`

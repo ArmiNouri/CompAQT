@@ -260,6 +260,30 @@ def train():
             operator_loss = get_operator_loss(operator_output, distances)
             operands_loss = get_operand_loss(operands_output, distances)
             loss = operator_loss + operands_loss 
+
+            #############compositional loss################
+            loss = (1.0-conf.lmbda) * loss
+            start_weights = torch.zeros_like(all_weights[0])
+            all_weights = [start_weights] + all_weights
+            for i in range(distances.size(0)): distances[i].fill_diagonal_(1.0)
+            for i in range(1, len(all_weights)):
+                weights_i = all_weights[i]
+                weights_i_min_1 = all_weights[i-1]
+                bs, l, _ = list(weights_i.size())
+                distances = distances + (1.0-input_mask.unsqueeze(2).repeat(1, 1, l))
+                distances = torch.min(distances, dim=1).values
+                distances = distances * input_mask
+                distances = distances.unsqueeze(2).repeat(1, 1, l)
+                p_prior = torch.nn.functional.relu(distances - weights_i_min_1)
+                comp_loss = weights_i - p_prior
+                comp_loss = comp_loss ** 2
+                comp_loss = comp_loss.sum(dim=2)
+                comp_loss = comp_loss.sum(dim=1) / l
+                comp_loss = comp_loss.sum() / bs
+                comp_loss = comp_loss - conf.alpha * i
+                loss += (conf.lmbda/len(all_weights)) * comp_loss
+            ###############################################
+
             loss.backward()
             optimizer.step()
 
