@@ -187,7 +187,8 @@ def train():
                 comp_loss = comp_loss.sum(dim=2)
                 comp_loss = comp_loss.sum(dim=1) / l
                 comp_loss = comp_loss.sum() / bs
-                this_loss += (0.1/len(all_weights)) * comp_loss
+                comp_loss = comp_loss - conf.alpha * i
+                this_loss += (conf.lmbda/len(all_weights)) * comp_loss
             ###############################################
 
             record_loss += this_loss.item()

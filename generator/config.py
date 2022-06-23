@@ -17,6 +17,9 @@ class parameters():
     train_file = root_path + "dataset/train_retrieve.json"
     valid_file = root_path + "dataset/dev_retrieve.json"
     test_file = root_path + "dataset/test_retrieve.json"
+    # which source to use
+    # finqa, tatqa, hitab, or multihiertt
+    source = "all"
 
     # infer table-only text-only
     # test_file = root_path + "dataset/test_retrieve_7k_text_only.json"
@@ -71,3 +74,7 @@ class parameters():
     report_loss = 100
 
     max_step_ind = 11
+
+    # parameters used by CompAQT
+    lmbda = 0.1
+    alpha = 0.1
