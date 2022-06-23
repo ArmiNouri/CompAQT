@@ -165,7 +165,7 @@ def read_txt(input_path, log_file):
     return items
 
 
-def read_examples(input_path, tokenizer, op_list, const_list, log_file):
+def read_examples(input_path, tokenizer, op_list, const_list, log_file, source='all'):
     """Read a json file into a list of examples."""
 
     write_log(log_file, "Reading " + input_path)
@@ -174,6 +174,7 @@ def read_examples(input_path, tokenizer, op_list, const_list, log_file):
 
     examples = []
     for entry in tqdm(input_data):
+        if source != 'all' and 'source' in entry and entry['source'] != source: continue
         examples.append(finqa_utils.read_mathqa_entry(entry, tokenizer))
         program = examples[-1].program
         for tok in program:
@@ -184,7 +185,7 @@ def read_examples(input_path, tokenizer, op_list, const_list, log_file):
     return input_data, examples, op_list, const_list
 
 
-def read_examples_simple(input_path, tokenizer, op_list, const_list, log_file):
+def read_examples_simple(input_path, tokenizer, op_list, const_list, log_file, source='all'):
     """Read a json file into a list of examples."""
 
     write_log(log_file, "Reading " + input_path)
@@ -193,6 +194,7 @@ def read_examples_simple(input_path, tokenizer, op_list, const_list, log_file):
 
     examples = []
     for entry in tqdm(input_data):
+        if source != 'all' and 'source' in entry and entry['source'] != source: continue
         examples.append(finqa_utils.read_mathqa_entry_simple(entry, tokenizer))
         program = examples[-1].program
         for tok in program:

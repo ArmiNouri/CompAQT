@@ -78,15 +78,15 @@ print(const_list)
 
 train_data, train_examples, op_list, const_list = \
     read_examples(input_path=conf.train_file, tokenizer=tokenizer,
-                  op_list=op_list, const_list=const_list, log_file=log_file)
+                  op_list=op_list, const_list=const_list, log_file=log_file, source=conf.source)
 
 valid_data, valid_examples, op_list, const_list = \
     read_examples(input_path=conf.valid_file, tokenizer=tokenizer,
-                  op_list=op_list, const_list=const_list, log_file=log_file)
+                  op_list=op_list, const_list=const_list, log_file=log_file, source=conf.source)
 
 test_data, test_examples, op_list, const_list = \
     read_examples(input_path=conf.test_file, tokenizer=tokenizer,
-                  op_list=op_list, const_list=const_list, log_file=log_file)
+                  op_list=op_list, const_list=const_list, log_file=log_file, source=conf.source)
 
 kwargs = {"examples": train_examples,
           "tokenizer": tokenizer,
