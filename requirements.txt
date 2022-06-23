@@ -1,4 +1,5 @@
 ast2json
 sympy
+bs4
 torch
 transformers

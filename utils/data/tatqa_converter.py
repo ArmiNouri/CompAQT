@@ -7,16 +7,7 @@ import re
 import json
 from ast2json import ast2json
 
-"""
-Need to preserve the following
-id
-qa, question
-qa, model_input
-qa, gold_inds
-qa exe_ans
-table (first row)
-program
-"""
+
 my_parser = argparse.ArgumentParser(description="Convert TAT-QA data file into FinQA format.")
 my_parser.add_argument("--input", "-i", dest="input_path", type=str, help="The path to input file.")
 my_parser.add_argument("--output", "-o", dest="output_path", type=str, help="The path to output file.")
@@ -293,8 +284,44 @@ def run(path: str):
     return output
 
 
-if __name__ == "__main__":
+def stats(train, dev, test):
+    cnt_per_step = {1:0, 2:0, 3:0}
+    with open(train, 'r') as f:
+        j = json.load(f)
+        for sample in j:
+            prog = sample['qa']['program']
+            prog = prog.replace('(', '{').replace(')', '{').replace(',', '{').split('{')
+            prog = [x for x in prog if len(x.strip()) > 0]
+            l = len(prog)//3
+            if l < 3: key = l
+            else: key = 3
+            cnt_per_step[key] = cnt_per_step[key]+1
+    with open(dev, 'r') as f:
+        j = json.load(f)
+        for sample in j:
+            prog = sample['qa']['program']
+            prog = prog.replace('(', '{').replace(')', '{').replace(',', '{').split('{')
+            prog = [x for x in prog if len(x.strip()) > 0]
+            l = len(prog)//3
+            if l < 3: key = l
+            else: key = 3
+            cnt_per_step[key] = cnt_per_step[key]+1
+    with open(test, 'r') as f:
+        j = json.load(f)
+        for sample in j:
+            prog = sample['qa']['program']
+            prog = prog.replace('(', '{').replace(')', '{').replace(',', '{').split('{')
+            prog = [x for x in prog if len(x.strip()) > 0]
+            l = len(prog)//3
+            if l < 3: key = l
+            else: key = 3
+            cnt_per_step[key] = cnt_per_step[key]+1
+    for key, value in cnt_per_step.items():
+        print(key, value)
 
+
+if __name__ == "__main__":
+    
     args = my_parser.parse_args()
     input_path = Path(args.input_path)
 
