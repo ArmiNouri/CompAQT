@@ -174,7 +174,7 @@ class Bert_model(nn.Module):
         self.seq_prj = nn.Linear(hidden_size, hidden_size, bias=True)
         self.seq_dropout = nn.Dropout(dropout_rate)
         self.input_self_attn = nn.MultiheadAttention(embed_dim=hidden_size, 
-                                                    num_heads=4,
+                                                    num_heads=conf.compaqt_num_heads,
                                                     dropout=dropout_rate,
                                                     bias=True, 
                                                     kdim=hidden_size, 
@@ -285,10 +285,13 @@ class Bert_model(nn.Module):
             decoder_history_ctx_embeddings = torch.matmul(
                 torch.transpose(decoder_history_attn_w, 1, 2), decoder_history)
 
-            sequence_output, weights = self.input_self_attn(sequence_output, 
+            if conf.compaqt:
+                sequence_output, weights = self.input_self_attn(sequence_output, 
                                                         sequence_output, 
                                                         sequence_output,
                                                         key_padding_mask=(1.0-input_mask).bool())
+            else:
+                weights = None
             all_weights.append(weights)
             
             if conf.sep_attention:

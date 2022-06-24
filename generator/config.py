@@ -76,5 +76,7 @@ class parameters():
     max_step_ind = 11
 
     # parameters used by CompAQT
+    compaqt = True
+    compaqt_num_heads = 1
     lmbda = 0.1
     alpha = 0.1

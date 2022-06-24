@@ -410,7 +410,7 @@ class Bert_model(nn.Module):
         facts_bert_outputs = self.bert(input_ids=facts_ids.long(), attention_mask=facts_mask, token_type_ids=facts_token_type_ids)
         facts_bert_sequence_output = facts_bert_outputs.last_hidden_state
         facts_encoded = facts_bert_sequence_output
-
+        
         # pairwise distance between question tokens and fact tokens
         distances = []
         for i in range(batch_size):

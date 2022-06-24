@@ -110,6 +110,32 @@ test_features = convert_examples_to_features(**kwargs)
 def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
+
+def get_alignment_loss(this_loss, all_weights, distances, input_mask):
+    #############compositional loss################
+    this_loss = (1.0-conf.lmbda) * this_loss
+    start_weights = torch.zeros_like(all_weights[0])
+    all_weights = [start_weights] + all_weights
+    for i in range(distances.size(0)): distances[i].fill_diagonal_(1.0)
+    for i in range(1, len(all_weights)):
+        weights_i = all_weights[i]
+        weights_i_min_1 = all_weights[i-1]
+        bs, l, _ = list(weights_i.size())
+        distances = distances + (1.0-input_mask.unsqueeze(2).repeat(1, 1, l))
+        distances = torch.min(distances, dim=1).values
+        distances = distances * input_mask
+        distances = distances.unsqueeze(2).repeat(1, 1, l)
+        p_prior = torch.nn.functional.relu(distances - weights_i_min_1)
+        comp_loss = weights_i - p_prior
+        comp_loss = comp_loss ** 2
+        comp_loss = comp_loss.sum(dim=2)
+        comp_loss = comp_loss.sum(dim=1) / l
+        comp_loss = comp_loss.sum() / bs
+        comp_loss = comp_loss - conf.alpha * i
+        this_loss += (conf.lmbda/len(all_weights)) * comp_loss
+    ###############################################
+    return this_loss
+
 def train():
     # keep track of all input parameters
     write_log(log_file, "####################INPUT PARAMETERS###################")
@@ -168,28 +194,7 @@ def train():
             # per token loss
             this_loss = this_loss.sum() / program_mask.sum()
 
-            #############compositional loss################
-            this_loss = (1.0-conf.lmbda) * this_loss
-            start_weights = torch.zeros_like(all_weights[0])
-            all_weights = [start_weights] + all_weights
-            for i in range(distances.size(0)): distances[i].fill_diagonal_(1.0)
-            for i in range(1, len(all_weights)):
-                weights_i = all_weights[i]
-                weights_i_min_1 = all_weights[i-1]
-                bs, l, _ = list(weights_i.size())
-                distances = distances + (1.0-input_mask.unsqueeze(2).repeat(1, 1, l))
-                distances = torch.min(distances, dim=1).values
-                distances = distances * input_mask
-                distances = distances.unsqueeze(2).repeat(1, 1, l)
-                p_prior = torch.nn.functional.relu(distances - weights_i_min_1)
-                comp_loss = weights_i - p_prior
-                comp_loss = comp_loss ** 2
-                comp_loss = comp_loss.sum(dim=2)
-                comp_loss = comp_loss.sum(dim=1) / l
-                comp_loss = comp_loss.sum() / bs
-                comp_loss = comp_loss - conf.alpha * i
-                this_loss += (conf.lmbda/len(all_weights)) * comp_loss
-            ###############################################
+            if conf.compaqt: this_loss = get_alignment_loss(this_loss, all_weights, distances, input_mask)
 
             record_loss += this_loss.item()
             record_k += 1
