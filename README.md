@@ -42,7 +42,8 @@ To select a particular dataset, set the `source` parameter in `generator/config.
 You can set up the environment by installing all requirements: `pip install -r requirements.txt`
 
 ## To run the FinQA model
-The code is largely adapted from [FinQA](https://github.com/czyssrs/finqa). All configurations are modifiable within `generator/config.py`
+The code is largely adapted from [FinQA](https://github.com/czyssrs/finqa). 
+All configurations are modifiable within `generator/config.py`
 * First navigate to the generator: `cd generator`
 * Run `chmod +x run_finqa.sh`
 * To run FinQA with CompAQT: `./run_finqa.sh`
