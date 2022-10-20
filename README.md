@@ -6,7 +6,10 @@ CompAQT is a method to improve compositional generalization for multi-step quant
 * Code and instructions on how to apply the CompAQT method to QA models.
 
 ## Dataset
-You can download the data from [this link](https://drive.google.com/file/d/1DCitTop_SKVPgq5fekF8VtYWOR07UB3J/view?usp=sharing).
+You can download the data from the below links:
+* [Train](https://drive.google.com/file/d/1VpiJyhndc-RzjBHRbG2xZTVOFrrPLmLg/view?usp=sharing).
+* [Dev](https://drive.google.com/file/d/1DCitTop_SKVPgq5fekF8VtYWOR07UB3J/view?usp=sharing).
+* [Test](https://drive.google.com/file/d/1gL4AzItN69WbsoycvmfIi_hHUoiiv3pX/view?usp=sharing).
 
 The dataset is composed of four previously released datasets that have been filtered and processed to focus on multi-step quantitative reasoning.
 * FinQA ([paper](https://aclanthology.org/2021.emnlp-main.300/), [github repo](https://github.com/czyssrs/finqa))
