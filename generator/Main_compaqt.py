@@ -153,7 +153,7 @@ def train():
                        const_list=const_list)
 
     print('Number of trainable parameters in model:', count_parameters(model))
-    model = nn.DataParallel(model)
+    # model = nn.DataParallel(model)
     model.to(conf.device)
 
     optimizer = optim.Adam(model.parameters(), conf.learning_rate)

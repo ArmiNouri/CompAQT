@@ -3,3 +3,5 @@ sympy
 bs4
 torch
 transformers
+tqdm
+six

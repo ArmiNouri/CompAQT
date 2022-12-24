@@ -418,4 +418,5 @@ class Bert_model(nn.Module):
                 [decoder_history, input_program_embeddings], dim=1)
 
         logits = torch.stack(logits, dim=1)
+        print(len(all_weights), all_weights[0].shape, logits.shape, decoder_history.shape)
         return all_weights, distances, logits

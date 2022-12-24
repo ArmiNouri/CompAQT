@@ -173,7 +173,7 @@ def read_examples(input_path, tokenizer, op_list, const_list, log_file, source='
         input_data = json.load(input_file)
 
     examples = []
-    for entry in tqdm(input_data):
+    for entry in tqdm(input_data[:100]):
         if source != 'all' and 'source' in entry and entry['source'] != source: continue
         examples.append(finqa_utils.read_mathqa_entry(entry, tokenizer))
         program = examples[-1].program
