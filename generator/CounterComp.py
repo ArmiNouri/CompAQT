@@ -25,15 +25,21 @@ class Sampler:
 
     def one_step_perturbation(self, ops):
         output = []
+        locations = []
         for idx, op in enumerate(ops):
             # deletion
-            if idx > 0 and idx < len(ops)-1: output.append(ops[:idx] + ops[idx+1:])
+            if idx > 0 and idx < len(ops)-1: 
+                output.append(ops[:idx] + ops[idx+1:])
+                locations.append(idx)
             # insertion
             for operator in self.op_list:
                 output.append(ops[:idx] + [operator] + ops[idx:])
+                locations.append(idx)
                 # edit
-                if operator != op: output.append(ops[:idx] + [operator] + ops[idx+1:])
-        return output
+                if operator != op: 
+                    output.append(ops[:idx] + [operator] + ops[idx+1:])
+                    locations.append(idx)
+        return output, locations
 
     def get_edit_dist(self, tks1, tks2):
         m, n = len(tks1), len(tks2)
@@ -90,7 +96,7 @@ class Sampler:
 
     def sample_pos_neg(self, anchor):
         pos = self.sample_pos(anchor)
-        neg = self.sample_neg(anchor)
+        neg, loc = self.sample_neg(anchor)
         anchor_spans = self.get_spans(anchor)
         pos_spans = self.get_spans(pos)
         neg_spans = self.get_spans(neg)
@@ -102,7 +108,7 @@ class Sampler:
         neg_dist = self.get_edit_dist(anchor_tks, neg_tks) if neg is not None else 0
         pos_idx = self.id_to_idx[pos.id] if pos is not None else anchor_idx
         neg_idx = self.id_to_idx[neg.id] if neg is not None else anchor_idx
-        return anchor_idx, pos_idx, neg_idx, pos_dist, neg_dist
+        return anchor_idx, pos_idx, neg_idx, loc, pos_dist, neg_dist
 
     def sample_pos(self, anchor):
         op = self.extract_operators(anchor.original_program)
@@ -114,13 +120,14 @@ class Sampler:
 
     def sample_neg(self, anchor):
         op = self.extract_operators(anchor.original_program)
-        perturbeds = self.one_step_perturbation(op.split(','))
-        shuffle(perturbeds)
-        for perturbed in perturbeds:
+        perturbeds, locations = self.one_step_perturbation(op.split(','))
+        zipped = list(zip(perturbeds, locations))
+        shuffle(zipped)
+        for perturbed, location in zipped:
             o = ','.join(perturbed)
             if o not in self.operator_map: continue
-            return choice(self.operator_map[o])
-        return None
+            return choice(self.operator_map[o]), location
+        return None, 0
 
 
 def _check_reduction_value(reduction: str):
