@@ -15,7 +15,7 @@ class parameters():
     test_file = root_path + "/dataset/test.json"
     # which source to use
     # finqa, tatqa, hitab, or multihiertt
-    source = "all"
+    source = "finqa"
 
     # infer table-only text-only
     # test_file = root_path + "dataset/test_retrieve_7k_text_only.json"
@@ -76,3 +76,7 @@ class parameters():
     compaqt_num_heads = 1
     lmbda = 0.1
     alpha = 0.1
+
+    # parameters used by CounterComp
+    countercomp = True
+    beta = 0.2

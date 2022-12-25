@@ -390,6 +390,39 @@ class DataLoader:
         random.shuffle(self.data)
         return
 
+    def get_items_at_indices(self, indices):
+        batch_data = {"unique_id": [],
+                      "example_index": [],
+                      "tokens": [],
+                      "question": [],
+                      "input_ids": [],
+                      "input_mask": [],
+                      "option_mask": [],
+                      "segment_ids": [],
+                      "options": [],
+                      "answer": [],
+                      "program": [],
+                      "program_ids": [],
+                      "program_weight": [],
+                      "program_mask": []}
+        for idx in indices:
+            each_data = self.data[idx]
+            batch_data["option_mask"].append(each_data.option_mask)
+            batch_data["input_mask"].append(each_data.input_mask)
+            batch_data["unique_id"].append(each_data.unique_id)
+            batch_data["example_index"].append(each_data.example_index)
+            batch_data["tokens"].append(each_data.tokens)
+            batch_data["question"].append(each_data.question)
+            batch_data["input_ids"].append(each_data.input_ids)
+            batch_data["segment_ids"].append(each_data.segment_ids)
+            batch_data["options"].append(each_data.options)
+            batch_data["answer"].append(each_data.answer)
+            batch_data["program"].append(each_data.program)
+            batch_data["program_ids"].append(each_data.program_ids)
+            batch_data["program_weight"].append(each_data.program_weight)
+            batch_data["program_mask"].append(each_data.program_mask)
+        return batch_data
+
     def get_batch(self):
         start_index = self.count * self.batch_size
         end_index = min((self.count + 1) * self.batch_size, self.data_size)

@@ -263,6 +263,7 @@ class Bert_model(nn.Module):
             1, batch_size, self.hidden_size, device=device)
         decoder_state_c = torch.zeros(
             1, batch_size, self.hidden_size, device=device)
+        decoder_state_hs = []
 
         float_input_mask = input_mask.float()
         float_input_mask = torch.unsqueeze(float_input_mask, dim=-1)
@@ -416,7 +417,9 @@ class Bert_model(nn.Module):
                 input_program_embeddings, (decoder_state_h, decoder_state_c))
             decoder_history = torch.cat(
                 [decoder_history, input_program_embeddings], dim=1)
+            decoder_state_hs.append(decoder_state_h)
 
+        decoder_state_hs = torch.cat(decoder_state_hs, dim=0).transpose(1, 0)
         logits = torch.stack(logits, dim=1)
-        print(len(all_weights), all_weights[0].shape, logits.shape, decoder_history.shape)
-        return all_weights, distances, logits
+        print(len(all_weights), all_weights[0].shape, logits.shape, decoder_history.shape, decoder_state_hs.shape)
+        return all_weights, distances, decoder_state_hs, logits
