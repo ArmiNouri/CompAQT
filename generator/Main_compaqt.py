@@ -199,7 +199,7 @@ def train():
                        const_list=const_list)
 
     print('Number of trainable parameters in model:', count_parameters(model))
-    # model = nn.DataParallel(model)
+    model = nn.DataParallel(model)
     model.to(conf.device)
 
     optimizer = optim.Adam(model.parameters(), conf.learning_rate)
@@ -215,12 +215,6 @@ def train():
     record_loss_k = 0
     loss, start_time = 0.0, time.time()
     record_loss = 0.0
-
-    with open(conf.source+'.tsv', 'w') as o:
-        for x in train_iterator:
-            example_idxs = x['example_index']
-            sample_indices = [sampler.sample_pos_neg(o, train_examples[idx]) for idx in example_idxs]
-    exit(1)
 
     for _ in range(conf.epoch):
         train_iterator.reset()
