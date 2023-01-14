@@ -115,7 +115,7 @@ def indices_to_prog(program_indices, numbers, number_indices, max_seq_length,
 class MathQAExample(
         collections.namedtuple(
             "MathQAExample",
-            "id original_question question_tokens options answer \
+            "source id original_question question_tokens options answer \
             numbers number_indices original_program program"
         )):
 
@@ -126,7 +126,7 @@ class MathQAExample(
 class MathQAExampleSimple(
         collections.namedtuple(
             "MathQAExample",
-            "id question question_tokens facts facts_tokens options answer \
+            "source id question question_tokens facts facts_tokens options answer \
             numbers number_indices original_program program"
         )):
 
@@ -590,6 +590,7 @@ def read_mathqa_entry(entry, tokenizer):
         program = None
 
     return MathQAExample(
+        source=entry['source'],
         id=this_id,
         original_question=original_question,
         question_tokens=question_tokens,
@@ -674,6 +675,7 @@ def read_mathqa_entry_simple(entry, tokenizer):
     else:
         program = None
     return MathQAExampleSimple(
+        source=entry['source'],
         id=this_id,
         question=question,
         question_tokens=tokenize(tokenizer, question),

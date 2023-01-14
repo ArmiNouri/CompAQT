@@ -94,9 +94,9 @@ class Sampler:
             output = output + tokens[span[0]:span[1]+1]
         return output
 
-    def sample_pos_neg(self, anchor):
-        pos = self.sample_pos(anchor)
-        neg, loc = self.sample_neg(anchor)
+    def sample_pos_neg(self, o, anchor):
+        pos, pos_count = self.sample_pos(anchor)
+        neg, loc, neg_count = self.sample_neg(anchor)
         anchor_spans = self.get_spans(anchor)
         pos_spans = self.get_spans(pos)
         neg_spans = self.get_spans(neg)
@@ -108,6 +108,12 @@ class Sampler:
         neg_dist = self.get_edit_dist(anchor_tks, neg_tks) if neg is not None else 0
         pos_idx = self.id_to_idx[pos.id] if pos is not None else anchor_idx
         neg_idx = self.id_to_idx[neg.id] if neg is not None else anchor_idx
+        print('anchor', anchor.source, anchor.id, anchor_tks, anchor.program)
+        line = '\t'.join([anchor.source, str(anchor.id), self.extract_operators(anchor.original_program), str(pos_count), str(neg_count)])
+        o.write(line + '\n')
+        # if pos: print('pos', pos.id, pos_tks, pos.program)
+        # if neg: print('neg', neg.id, neg_tks, neg.program)
+        # print('========')
         return anchor_idx, pos_idx, neg_idx, loc, pos_dist, neg_dist
 
     def sample_pos(self, anchor):
@@ -115,19 +121,20 @@ class Sampler:
         samples = self.operator_map.get(op, [])
         samples = [sample for sample in samples if sample.id != anchor.id]
         if len(samples) == 0:
-            return None
-        return choice(samples)
+            return None, 0
+        return choice(samples), len(samples)
 
     def sample_neg(self, anchor):
         op = self.extract_operators(anchor.original_program)
         perturbeds, locations = self.one_step_perturbation(op.split(','))
         zipped = list(zip(perturbeds, locations))
         shuffle(zipped)
+        count_match = [y for x in [self.operator_map.get(','.join(o), []) for o, l in zipped] for y in x]
         for perturbed, location in zipped:
             o = ','.join(perturbed)
             if o not in self.operator_map: continue
-            return choice(self.operator_map[o]), location
-        return None, 0
+            return choice(self.operator_map[o]), location, len(count_match)
+        return None, 0, len(count_match)
 
 
 def _check_reduction_value(reduction: str):

@@ -152,10 +152,10 @@ def get_alignment_loss(this_loss, all_weights, distances, input_mask):
     return this_loss
 
 
-def get_countercomp_triplet_loss(this_loss, train_iterator, x, a_decoder_hidden, model):
+def get_countercomp_triplet_loss(o, this_loss, train_iterator, x, a_decoder_hidden, model):
     ### Begin CounterComp sampling ###
     example_idxs = x['example_index']
-    sample_indices = [sampler.sample_pos_neg(train_examples[idx]) for idx in example_idxs]
+    sample_indices = [sampler.sample_pos_neg(o, train_examples[idx]) for idx in example_idxs]
     sample_indices = [[x[0], x[1], x[2], x[3], x[4], x[5]] for x in sample_indices]
     anchors = train_iterator.get_items_at_indices([x[0] for x in sample_indices])
     poss = train_iterator.get_items_at_indices([x[1] for x in sample_indices])
@@ -215,6 +215,12 @@ def train():
     record_loss_k = 0
     loss, start_time = 0.0, time.time()
     record_loss = 0.0
+
+    with open(conf.source+'.tsv', 'w') as o:
+        for x in train_iterator:
+            example_idxs = x['example_index']
+            sample_indices = [sampler.sample_pos_neg(o, train_examples[idx]) for idx in example_idxs]
+    exit(1)
 
     for _ in range(conf.epoch):
         train_iterator.reset()

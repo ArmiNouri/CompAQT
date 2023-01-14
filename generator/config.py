@@ -15,7 +15,7 @@ class parameters():
     test_file = root_path + "/dataset/test.json"
     # which source to use
     # finqa, tatqa, hitab, or multihiertt
-    source = "finqa"
+    source = "multihiertt"
 
     # infer table-only text-only
     # test_file = root_path + "dataset/test_retrieve_7k_text_only.json"
@@ -63,7 +63,7 @@ class parameters():
 
     batch_size = 4
     batch_size_test = 4
-    epoch = 300
+    epoch = 1
     learning_rate = 2e-5
 
     report = 300
