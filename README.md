@@ -1,4 +1,4 @@
-# CompAQT
+# CounterComp
 
 ## Introduction
 CounterComp is a method to improve compositional generalization for multi-step quantitative reasoning for question answering over tabular data. This repository contains:
@@ -49,12 +49,12 @@ The code is largely adapted from [FinQA](https://github.com/czyssrs/finqa).
 All configurations are modifiable within `generator/config.py`
 * First navigate to the generator: `cd generator`
 * Run `chmod +x run_finqa.sh`
-* To run FinQA with CompAQT: `./run_finqa.sh`
+* Run: `./run_finqa.sh`
 
 ## To run the PVN baseline
 * First navigate to the generator: `cd generator`
 * Run `chmod +x run_pvn.sh`
-* To run FinQA with CompAQT: `./run_pvn.sh`
+* Run: `./run_pvn.sh`
 
 ## To enable the CompAQT baseline
 * Change the `compaqt` parameter to `True` in `generator/config.py`
