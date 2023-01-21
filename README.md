@@ -1,12 +1,12 @@
 # CompAQT
 
 ## Introduction
-CompAQT is a method to improve compositional generalization for multi-step quantitative reasoning for question answering over tabular data. This repository contains:
+CounterComp is a method to improve compositional generalization for multi-step quantitative reasoning for question answering over tabular data. This repository contains:
 * A dataset composed of multi-step quatitative reasoning samples from four previously published datasets.
-* Code and instructions on how to apply the CompAQT method to QA models.
+* Code and instructions on how to apply the CounterComp method to QA models.
 
 ## Dataset
-You can download the data from the below links:
+You can download the data from the below links and move the files under `project/home/directory/dataset`:
 * [Train](https://drive.google.com/file/d/1VpiJyhndc-RzjBHRbG2xZTVOFrrPLmLg/view?usp=sharing)
 * [Dev](https://drive.google.com/file/d/1DCitTop_SKVPgq5fekF8VtYWOR07UB3J/view?usp=sharing)
 * [Test](https://drive.google.com/file/d/1gL4AzItN69WbsoycvmfIi_hHUoiiv3pX/view?usp=sharing)
@@ -44,14 +44,20 @@ To select a particular dataset, set the `source` parameter in `generator/config.
 ## Setting up the environment
 You can set up the environment by installing all requirements: `pip install -r requirements.txt`
 
-## To run the FinQA model
+## To run the FinQA baseline
 The code is largely adapted from [FinQA](https://github.com/czyssrs/finqa). 
 All configurations are modifiable within `generator/config.py`
 * First navigate to the generator: `cd generator`
 * Run `chmod +x run_finqa.sh`
 * To run FinQA with CompAQT: `./run_finqa.sh`
 
-## To run the PVN model
+## To run the PVN baseline
 * First navigate to the generator: `cd generator`
 * Run `chmod +x run_pvn.sh`
 * To run FinQA with CompAQT: `./run_pvn.sh`
+
+## To enable the CompAQT baseline
+* Change the `compaqt` parameter to `True` in `generator/config.py`
+
+## To enable the CounterComp loss
+* Change the `countercomp` parameter to `True` in `generator/config.py`

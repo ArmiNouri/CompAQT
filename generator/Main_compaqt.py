@@ -152,34 +152,36 @@ def get_alignment_loss(this_loss, all_weights, distances, input_mask):
     return this_loss
 
 
-def get_countercomp_triplet_loss(o, this_loss, train_iterator, x, a_decoder_hidden, model):
+def get_countercomp_triplet_loss(this_loss, train_iterator, x, a_decoder_hidden, model):
     ### Begin CounterComp sampling ###
     example_idxs = x['example_index']
-    sample_indices = [sampler.sample_pos_neg(o, train_examples[idx]) for idx in example_idxs]
-    sample_indices = [[x[0], x[1], x[2], x[3], x[4], x[5]] for x in sample_indices]
-    anchors = train_iterator.get_items_at_indices([x[0] for x in sample_indices])
-    poss = train_iterator.get_items_at_indices([x[1] for x in sample_indices])
-    negs = train_iterator.get_items_at_indices([x[2] for x in sample_indices])
-    locations = torch.tensor([x[3] for x in sample_indices], device=conf.device)
-    pos_dists = torch.tensor([x[4] for x in sample_indices], device=conf.device)
-    neg_dists = torch.tensor([x[5] for x in sample_indices], device=conf.device)
-    margin = (neg_dists-pos_dists+1.0)/2.0   # Token level distances, normalized between 0 and 1.
-    margin = margin.unsqueeze(1)
-    # a_input_ids, a_input_mask, a_segment_ids, a_program_ids, a_program_mask, a_option_mask = tensorize_sample(anchors)
-    p_input_ids, p_input_mask, p_segment_ids, p_program_ids, p_program_mask, p_option_mask = tensorize_sample(poss)
-    n_input_ids, n_input_mask, n_segment_ids, n_program_ids, n_program_mask, n_option_mask = tensorize_sample(negs)
-    # a_weights, a_distances, a_decoder_hidden, a_logits = model(True, a_input_ids, a_input_mask, a_segment_ids,
-    #                     a_option_mask, a_program_ids, a_program_mask, device=conf.device)
-    p_weights, p_distances, p_decoder_hidden, p_logits = model(True, p_input_ids, p_input_mask, p_segment_ids,
-                        p_option_mask, p_program_ids, p_program_mask, device=conf.device)
-    n_weights, n_distances, n_decoder_hidden, n_logits = model(True, n_input_ids, n_input_mask, n_segment_ids,
-                        n_option_mask, n_program_ids, n_program_mask, device=conf.device)
-    a_h = a_decoder_hidden[:, locations, :]
-    p_h = p_decoder_hidden[:, locations, :]
-    n_h = n_decoder_hidden[:, locations, :]
-    triplet_loss = triplet_margin_with_distance_loss(a_h, p_h, n_h, margin)
+    triplet_loss = torch.tensor(0.0, requires_grad=True)
+    for _ in range(conf.num_samples):
+        sample_indices = [sampler.sample_pos_neg(train_examples[idx]) for idx in example_idxs]
+        sample_indices = [[x[0], x[1], x[2], x[3], x[4], x[5]] for x in sample_indices]
+        anchors = train_iterator.get_items_at_indices([x[0] for x in sample_indices])
+        poss = train_iterator.get_items_at_indices([x[1] for x in sample_indices])
+        negs = train_iterator.get_items_at_indices([x[2] for x in sample_indices])
+        locations = torch.tensor([x[3] for x in sample_indices], device=conf.device)
+        pos_dists = torch.tensor([x[4] for x in sample_indices], device=conf.device)
+        neg_dists = torch.tensor([x[5] for x in sample_indices], device=conf.device)
+        margin = 1.0 - torch.abs((neg_dists-pos_dists+1.0)/2.0)   # Token level distances, normalized between 0 and 1.
+        margin = margin.unsqueeze(1)
+        # a_input_ids, a_input_mask, a_segment_ids, a_program_ids, a_program_mask, a_option_mask = tensorize_sample(anchors)
+        p_input_ids, p_input_mask, p_segment_ids, p_program_ids, p_program_mask, p_option_mask = tensorize_sample(poss)
+        n_input_ids, n_input_mask, n_segment_ids, n_program_ids, n_program_mask, n_option_mask = tensorize_sample(negs)
+        # a_weights, a_distances, a_decoder_hidden, a_logits = model(True, a_input_ids, a_input_mask, a_segment_ids,
+        #                     a_option_mask, a_program_ids, a_program_mask, device=conf.device)
+        p_weights, p_distances, p_decoder_hidden, p_logits = model(True, p_input_ids, p_input_mask, p_segment_ids,
+                            p_option_mask, p_program_ids, p_program_mask, device=conf.device)
+        n_weights, n_distances, n_decoder_hidden, n_logits = model(True, n_input_ids, n_input_mask, n_segment_ids,
+                            n_option_mask, n_program_ids, n_program_mask, device=conf.device)
+        a_h = a_decoder_hidden[:, locations, :]
+        p_h = p_decoder_hidden[:, locations, :]
+        n_h = n_decoder_hidden[:, locations, :]
+        triplet_loss = triplet_loss + triplet_margin_with_distance_loss(a_h, p_h, n_h, margin)
     ### End CounterComp sampling ###
-    return (1.-conf.beta) * this_loss + conf.beta * triplet_loss
+    return (1.-conf.lmbda_counter_comp) * this_loss + conf.lmbda_counter_comp * triplet_loss / conf.num_samples
 
 
 def train():

@@ -389,10 +389,13 @@ class Bert_model(nn.Module):
                 decoder_step_vec = torch.squeeze(decoder_step_vec)
 
                 this_step_new_emb = decoder_step_vec  # [batch, hidden]
+                # fix for a batch size of 1: 
+                if len(list(this_step_new_emb.size())) == 1: this_step_new_emb = this_step_new_emb.unsqueeze(0)
+                this_step_new_emb = torch.unsqueeze(this_step_new_emb, 1)  # [batch, 1, hidden]
 
-                this_step_new_emb = torch.unsqueeze(this_step_new_emb, 1)
                 this_step_new_emb = this_step_new_emb.repeat(
                     1, self.reserved_token_size+self.input_length, 1)  # [batch, op seq, hidden]
+
 
                 this_step_mask = torch.unsqueeze(
                     this_step_mask, 0)  # [1, op seq]
@@ -421,5 +424,5 @@ class Bert_model(nn.Module):
 
         decoder_state_hs = torch.cat(decoder_state_hs, dim=0).transpose(1, 0)
         logits = torch.stack(logits, dim=1)
-        print(len(all_weights), all_weights[0].shape, logits.shape, decoder_history.shape, decoder_state_hs.shape)
+
         return all_weights, distances, decoder_state_hs, logits

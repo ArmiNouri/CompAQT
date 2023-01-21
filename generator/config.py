@@ -3,19 +3,19 @@ class parameters():
     prog_name = "generator"
 
     # set up your own path here
-    root_path = "/home/ubuntu/CompAQT"
-    output_path = "/home/ubuntu/efs/finqa/countercomp/output"
-    cache_dir = "/home/ubuntu/efs/finqa/countercomp/cache"
+    root_path = "your_project_path"
+    output_path = "path_to_store_outputs"
+    cache_dir = "path_for_other_cache"
 
     model_save_name = "bert-base"
 
     ### files from the retriever results
-    train_file = "/home/ubuntu/efs/finqa/countercomp/dataset/train.json"
-    valid_file = "/home/ubuntu/efs/finqa/countercomp/dataset/dev.json"
-    test_file = "/home/ubuntu/efs/finqa/countercomp/dataset/test.json"
+    train_file = root_path + "dataset/train.json"
+    valid_file = root_path + "dataset/dev.json"
+    test_file = root_path + "dataset/test.json"
     # which source to use
-    # finqa, tatqa, hitab, or multihiertt
-    source = "finqa"
+    # options: finqa, tatqa, hitab, multihiertt, all
+    source = "all"
 
     # infer table-only text-only
     # test_file = root_path + "dataset/test_retrieve_7k_text_only.json"
@@ -61,8 +61,8 @@ class parameters():
     n_best_size = 20
     dropout_rate = 0.1
 
-    batch_size = 4
-    batch_size_test = 4
+    batch_size = 8
+    batch_size_test = 8
     epoch = 1
     learning_rate = 2e-5
 
@@ -79,4 +79,5 @@ class parameters():
 
     # parameters used by CounterComp
     countercomp = True
-    beta = 0.2
+    lmbda_counter_comp = 0.4
+    num_samples = 5

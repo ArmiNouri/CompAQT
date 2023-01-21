@@ -72,7 +72,9 @@ class Sampler:
     def get_spans(self, sample):
         if sample is None: return []
         tokens = sample.question_tokens
-        idx = tokens.index('[SEP]')
+        if '[SEP]' in tokens: idx = tokens.index('[SEP]')
+        elif  '</s>' in tokens: idx = tokens.index('</s>')
+        else: idx = len(tokens)-1
         question_tokens = tokens[:idx]
         facts_tokens = tokens[idx+1:]
         ft = set(facts_tokens)
@@ -94,7 +96,7 @@ class Sampler:
             output = output + tokens[span[0]:span[1]+1]
         return output
 
-    def sample_pos_neg(self, o, anchor):
+    def sample_pos_neg(self, anchor):
         pos, pos_count = self.sample_pos(anchor)
         neg, loc, neg_count = self.sample_neg(anchor)
         anchor_spans = self.get_spans(anchor)
@@ -108,9 +110,9 @@ class Sampler:
         neg_dist = self.get_edit_dist(anchor_tks, neg_tks) if neg is not None else 0
         pos_idx = self.id_to_idx[pos.id] if pos is not None else anchor_idx
         neg_idx = self.id_to_idx[neg.id] if neg is not None else anchor_idx
-        print('anchor', anchor.source, anchor.id, anchor_tks, anchor.program)
-        line = '\t'.join([anchor.source, str(anchor.id), self.extract_operators(anchor.original_program), str(pos_count), str(neg_count)])
-        o.write(line + '\n')
+        # print('anchor', anchor.source, anchor.id, anchor_tks, anchor.program)
+        # line = '\t'.join([anchor.source, str(anchor.id), self.extract_operators(anchor.original_program), str(pos_count), str(neg_count)])
+        # o.write(line + '\n')
         # if pos: print('pos', pos.id, pos_tks, pos.program)
         # if neg: print('neg', neg.id, neg_tks, neg.program)
         # print('========')
